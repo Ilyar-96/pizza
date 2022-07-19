@@ -3,6 +3,7 @@
 .pizza-block {
 	display: flex;
 	flex-direction: column;
+	justify-self: center;
 	width: 100%;
 	max-width: 280px;
 	margin-bottom: 65px;

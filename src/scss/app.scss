@@ -33,14 +33,24 @@ body {
 		display: grid;
 		gap: 20px;
 
-		@media (min-width:650.98px) {
-			grid-template-columns: repeat(auto-fit, minmax(200px, 280px));
-			justify-content: space-around;
+		@media (min-width:1420.98px) {
+			grid-template-columns: repeat(4, minmax(280px, 1fr));
 		}
 
-		@media (max-width:650.98px) {
-			grid-template-columns: 280px;
-			justify-content: center;
+		@media (min-width:1100.98px) and(max-width:1420.98px) {
+			grid-template-columns: repeat(3, minmax(280px, 1fr));
+		}
+
+		@media (min-width:767.98px) and(max-width:1100.98px) {
+			grid-template-columns: repeat(2, minmax(280px, 1fr));
+		}
+
+		&--empty {
+			grid-template-columns: 1fr;
+
+			>h3 {
+				text-align: center;
+			}
 		}
 	}
 
