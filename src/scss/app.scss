@@ -32,6 +32,7 @@ body {
 	&__items {
 		display: grid;
 		gap: 20px;
+		min-height: 537px;
 
 		@media (min-width:1420.98px) {
 			grid-template-columns: repeat(4, minmax(280px, 1fr));

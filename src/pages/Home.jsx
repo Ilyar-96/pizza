@@ -4,8 +4,9 @@ import { Categories } from '../components/Categories';
 import { Sort } from '../components/Sort';
 import { PizzaBlock } from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
+import Pagination from '../components/Pagination';
 
-const Home = () => {
+const Home = ({ searchValue }) => {
 	const [items, setItems] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [categoryId, setCategoryId] = useState(0);
@@ -14,6 +15,15 @@ const Home = () => {
 		sortProperty: 'rating',
 		order: 'desc'
 	});
+	const [currentPage, setCurrentPage] = useState(1);
+	const [pagesCount, setPagesCount] = useState(0);
+
+	const urlParams = [
+		categoryId !== 0 ? `category=${categoryId}` : '',
+		sortType.sortProperty !== 0 ? `sortBy=${sortType.sortProperty}&order=${sortType.order}` : '',
+		searchValue ? `title=${searchValue}` : '',
+	].join('&');
+	const itemsLimit = 4;
 
 	const onRequest = async (params = '') => {
 		const res = await fetch(`https://62d50136d4406e523550b12e.mockapi.io/items/?${params}`);
@@ -24,22 +34,27 @@ const Home = () => {
 	}
 
 	useEffect(() => {
-		const params = [
-			categoryId !== 0 ? `category=${categoryId}` : '',
-			sortType.sortProperty !== 0 ? `sortBy=${sortType.sortProperty}&order=${sortType.order}` : ''
-		].join('&');
-
+		setCurrentPage(1);
 		setIsLoading(true);
-		onRequest(params)
+		onRequest(urlParams)
+			.then(res => {
+				setIsLoading(false);
+				setPagesCount(res.length / itemsLimit);
+			});
+	}, [categoryId, sortType, searchValue])
+
+	useEffect(() => {
+		setIsLoading(true);
+		onRequest(`${urlParams}&page=${currentPage}&limit=${itemsLimit}`)
 			.then(res => {
 				setIsLoading(false);
 				setItems(res);
 			});
-	}, [categoryId, sortType])
+	}, [categoryId, sortType, searchValue, currentPage])
 
 	const pizzas = !isLoading &&
 		(
-			items.length > 0 ?
+			pagesCount > 0 ?
 				items.map((pizza) => (
 					<PizzaBlock
 						key={pizza.id}
@@ -48,8 +63,8 @@ const Home = () => {
 				<h3>В данный момент пиццы отстуствуют</h3>
 		);
 
-	const loading = isLoading &&
-		Array.from(Array(12), () => 0).map((_, i) => (
+	const skeleton = isLoading &&
+		Array.from(Array(4), () => 0).map((_, i) => (
 			<Skeleton key={i} />
 		));
 
@@ -71,9 +86,15 @@ const Home = () => {
 			<h2 className="content__title">Все пиццы</h2>
 
 			<div className={itemsClass}>
-				{loading}
+				{skeleton}
 				{pizzas}
 			</div>
+
+			{pagesCount > 1 &&
+				(<Pagination
+					pagesCount={pagesCount}
+					itemsLimit={itemsLimit}
+					onChangePage={setCurrentPage} />)}
 		</div>
 	)
 }
