@@ -1,0 +1,18 @@
+.root {
+	padding: 0px 10px;
+	text-align: center;
+
+	h2 {
+		margin-bottom: 20px;
+	}
+
+	>span {
+		display: inline-block;
+		font-size: 48px;
+		margin-bottom: 20px;
+	}
+}
+
+.description {
+	font-size: 16px;
+}

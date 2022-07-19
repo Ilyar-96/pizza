@@ -1,0 +1,69 @@
+@import '../variables';
+
+.categories {
+	overflow-x: auto;
+
+	/* ie 10+ */
+	-ms-overflow-style: none;
+	/* фф (свойство больше не работает, других способов тоже нет)*/
+	overflow: -moz-scrollbars-none;
+
+	/* хром, сафари */
+	&::-webkit-scrollbar {
+		width: 0;
+		height: 0;
+	}
+
+	@media (max-width: 991.98px) {
+		margin-right: -$container-padding-mob;
+		margin-left: -$container-padding-mob;
+	}
+
+	ul {
+		display: flex;
+
+		@media (max-width: 991.98px) {
+
+			&::after,
+			&::before {
+				content: '';
+				display: block;
+				width: 0.1px;
+				height: 0.1px;
+				flex: 0 0 0.1px;
+			}
+
+			&::before {
+				margin-right: $container-padding-mob;
+			}
+		}
+
+		li {
+			background-color: #f9f9f9;
+			padding: 13px 30px;
+			border-radius: 30px;
+			margin-right: 10px;
+			font-weight: bold;
+			cursor: pointer;
+			transition: background-color 0.1s ease-in-out;
+			@include noselect();
+
+			&:hover {
+				background-color: darken(#f9f9f9, 2%);
+			}
+
+			&:active {
+				background-color: darken(#f9f9f9, 5%);
+			}
+
+			&.active {
+				background-color: #282828;
+				color: #fff;
+			}
+
+			@media (max-width: 991.98px) {
+				margin-right: $container-padding-mob;
+			}
+		}
+	}
+}
