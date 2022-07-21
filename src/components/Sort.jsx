@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 
+const list = [
+	{ name: 'популярности (по возрастанию)', sortProperty: 'rating', order: 'asc' },
+	{ name: 'популярности  (по убыванию)', sortProperty: 'rating', order: 'desc' },
+	{ name: 'цене (сначала дешевые)', sortProperty: 'price', order: 'asc' },
+	{ name: 'цене  (сначала дорогие)', sortProperty: 'price', order: 'desc' },
+	{ name: 'алфавиту (А-Я)', sortProperty: 'title', order: 'asc' },
+	{ name: 'алфавиту (Я-А)', sortProperty: 'title', order: 'desc' },
+];
+
 export function Sort({ value, onChangeSort }) {
 	const [open, setOpen] = useState(false);
-	const list = [
-		{ name: 'популярности (по возрастанию)', sortProperty: 'rating', order: 'asc' },
-		{ name: 'популярности  (по убыванию)', sortProperty: 'rating', order: 'desc' },
-		{ name: 'цене (сначала дешевые)', sortProperty: 'price', order: 'asc' },
-		{ name: 'цене  (сначала дорогие)', sortProperty: 'price', order: 'desc' },
-		{ name: 'алфавиту (А-Я)', sortProperty: 'title', order: 'asc' },
-		{ name: 'алфавиту (Я-А)', sortProperty: 'title', order: 'desc' },
-	];
 	const popupRef = useRef(null);
+
 
 	const handleOutsideClick = e => {
 		const path = e.path || (e.composedPath && e.composedPath());

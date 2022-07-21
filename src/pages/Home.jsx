@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Categories } from '../components/Categories';
 import { Sort } from '../components/Sort';
@@ -6,26 +7,34 @@ import { PizzaBlock } from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
 import { SearchContext } from '../App';
+import { setCategoryId } from '../redux/slices/filterSlice';
+import { setSortType } from "../redux/slices/filterSlice";
 
 const Home = () => {
+	const dispatch = useDispatch();
+	const { categoryId, sortType } = useSelector(({ filters }) => filters);
 	const { searchValue } = useContext(SearchContext);
 	const [items, setItems] = useState([]);
+	const [pagesCount, setPagesCount] = useState(1);
 	const [isLoading, setIsLoading] = useState(true);
-	const [categoryId, setCategoryId] = useState(0);
-	const [sortType, setSortType] = useState({
-		name: 'популярности  (по убыванию)',
-		sortProperty: 'rating',
-		order: 'desc'
-	});
 	const [currentPage, setCurrentPage] = useState(1);
-	const [pagesCount, setPagesCount] = useState(0);
 
+	const itemsPerPage = 4;
 	const urlParams = [
 		categoryId !== 0 ? `category=${categoryId}` : '',
 		sortType.sortProperty !== 0 ? `sortBy=${sortType.sortProperty}&order=${sortType.order}` : '',
 		searchValue ? `title=${searchValue}` : '',
 	].join('&');
-	const itemsLimit = 4;
+
+	const onChangeCategory = (index) => {
+		dispatch(setCategoryId(index));
+		setCurrentPage(1);
+	}
+
+	const onClickSort = (obj) => {
+		dispatch(setSortType(obj));
+		setCurrentPage(1);
+	}
 
 	const onRequest = async (params = '') => {
 		const res = await fetch(`https://62d50136d4406e523550b12e.mockapi.io/items/?${params}`);
@@ -36,18 +45,17 @@ const Home = () => {
 	}
 
 	useEffect(() => {
-		setCurrentPage(1);
-		setIsLoading(true);
 		onRequest(urlParams)
 			.then(res => {
-				setIsLoading(false);
-				setPagesCount(res.length / itemsLimit);
+				setPagesCount(Math.ceil(res.length / itemsPerPage));
 			});
-	}, [categoryId, sortType, searchValue])
+	}, [categoryId, searchValue])
 
 	useEffect(() => {
+		const page = `&page=${currentPage}&limit=${itemsPerPage}`;
+
 		setIsLoading(true);
-		onRequest(`${urlParams}&page=${currentPage}&limit=${itemsLimit}`)
+		onRequest(`${urlParams}${page}`)
 			.then(res => {
 				setIsLoading(false);
 				setItems(res);
@@ -80,10 +88,10 @@ const Home = () => {
 			<div className="content__top">
 				<Categories
 					value={categoryId}
-					onClickCategory={(index) => setCategoryId(index)} />
+					onChangeCategory={onChangeCategory} />
 				<Sort
 					value={sortType}
-					onChangeSort={(index) => setSortType(index)} />
+					onChangeSort={onClickSort} />
 			</div>
 			<h2 className="content__title">Все пиццы</h2>
 
@@ -95,7 +103,8 @@ const Home = () => {
 			{pagesCount > 1 &&
 				(<Pagination
 					pagesCount={pagesCount}
-					itemsLimit={itemsLimit}
+					itemsPerPage={itemsPerPage}
+					currentPage={currentPage}
 					onChangePage={setCurrentPage} />)}
 		</div>
 	)
