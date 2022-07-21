@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Categories } from '../components/Categories';
@@ -6,18 +6,16 @@ import { Sort } from '../components/Sort';
 import { PizzaBlock } from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
-import { SearchContext } from '../App';
-import { setCategoryId } from '../redux/slices/filterSlice';
-import { setSortType } from "../redux/slices/filterSlice";
+import { setCategoryId, setCurrentPage, setSortType } from '../redux/slices/filterSlice';
+import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 
 const Home = () => {
 	const dispatch = useDispatch();
-	const { categoryId, sortType } = useSelector(({ filters }) => filters);
-	const { searchValue } = useContext(SearchContext);
+	const { categoryId, sortType, searchValue, currentPage } = useSelector(({ filters }) => filters);
 	const [items, setItems] = useState([]);
-	const [pagesCount, setPagesCount] = useState(1);
+	const [pageCount, setPageCount] = useState(1);
 	const [isLoading, setIsLoading] = useState(true);
-	const [currentPage, setCurrentPage] = useState(1);
 
 	const itemsPerPage = 4;
 	const urlParams = [
@@ -28,43 +26,42 @@ const Home = () => {
 
 	const onChangeCategory = (index) => {
 		dispatch(setCategoryId(index));
-		setCurrentPage(1);
+		dispatch(setCurrentPage(1));
 	}
 
 	const onClickSort = (obj) => {
 		dispatch(setSortType(obj));
-		setCurrentPage(1);
+		dispatch(setCurrentPage(1));
 	}
 
-	const onRequest = async (params = '') => {
-		const res = await fetch(`https://62d50136d4406e523550b12e.mockapi.io/items/?${params}`);
-
-		if (!res.ok) throw new Error('Ошибка при получениие данных');
-
-		return res.json();
+	const onChangePage = (number) => {
+		dispatch(setCurrentPage(number));
 	}
 
 	useEffect(() => {
-		onRequest(urlParams)
-			.then(res => {
-				setPagesCount(Math.ceil(res.length / itemsPerPage));
-			});
+		console.log(urlParams);
+		axios
+			.get(`https://62d50136d4406e523550b12e.mockapi.io/items/?${urlParams}`)
+			.then(({ data }) => setPageCount(Math.ceil(data.length / itemsPerPage)));
+		// eslint-disable-next-line
 	}, [categoryId, searchValue])
 
 	useEffect(() => {
 		const page = `&page=${currentPage}&limit=${itemsPerPage}`;
 
 		setIsLoading(true);
-		onRequest(`${urlParams}${page}`)
-			.then(res => {
+		axios
+			.get(`https://62d50136d4406e523550b12e.mockapi.io/items/?${urlParams}${page}`)
+			.then(({ data }) => {
 				setIsLoading(false);
-				setItems(res);
+				setItems(data);
 			});
+		// eslint-disable-next-line
 	}, [categoryId, sortType, searchValue, currentPage])
 
 	const pizzas = !isLoading &&
 		(
-			pagesCount > 0 ?
+			pageCount > 0 ?
 				items.map((pizza) => (
 					<PizzaBlock
 						key={pizza.id}
@@ -100,12 +97,12 @@ const Home = () => {
 				{pizzas}
 			</div>
 
-			{pagesCount > 1 &&
+			{pageCount > 1 &&
 				(<Pagination
-					pagesCount={pagesCount}
+					pageCount={pageCount}
 					itemsPerPage={itemsPerPage}
 					currentPage={currentPage}
-					onChangePage={setCurrentPage} />)}
+					onChangePage={onChangePage} />)}
 		</div>
 	)
 }
