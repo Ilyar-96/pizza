@@ -1,4 +1,6 @@
-export function Categories({ value, onChangeCategory }) {
+import React from "react";
+
+const Categories = ({ value, onChangeCategory }) => {
 
 	const categories = [
 		'Все',
@@ -21,4 +23,6 @@ export function Categories({ value, onChangeCategory }) {
 				))}
 		</ul>
 	</div >);
-}
+};
+
+export default React.memo(Categories);

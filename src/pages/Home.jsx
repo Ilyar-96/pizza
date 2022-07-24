@@ -1,87 +1,143 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import qs from 'qs'
+import { useNavigate } from 'react-router-dom';
 
-import { Categories } from '../components/Categories';
-import { Sort } from '../components/Sort';
-import { PizzaBlock } from '../components/PizzaBlock';
+import Categories from '../components/Categories';
+import Sort, { sortList } from '../components/Sort';
+import PizzaBlock from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
-import { setCategoryId, setCurrentPage, setSortType } from '../redux/slices/filterSlice';
-import axios from 'axios';
-import { useSearchParams } from 'react-router-dom';
+import { setCategoryId, setCurrentPage, setFilters, setSortType } from '../redux/slices/filterSlice';
+import { fetchPizzas } from '../redux/slices/pizzasSlice';
 
 const Home = () => {
 	const dispatch = useDispatch();
-	const { categoryId, sortType, searchValue, currentPage } = useSelector(({ filters }) => filters);
-	const [items, setItems] = useState([]);
-	const [pageCount, setPageCount] = useState(1);
-	const [isLoading, setIsLoading] = useState(true);
+	const navigate = useNavigate();
+	const isSearch = useRef(false);
+	const isMounted = useRef(false);
 
-	const itemsPerPage = 4;
+	const { categoryId, sortType, searchValue, currentPage } = useSelector(({ filters }) => filters);
+	const { items, pageCount, itemsPerPage, status } = useSelector((state) => state.pizzas);
+
 	const urlParams = [
 		categoryId !== 0 ? `category=${categoryId}` : '',
 		sortType.sortProperty !== 0 ? `sortBy=${sortType.sortProperty}&order=${sortType.order}` : '',
 		searchValue ? `title=${searchValue}` : '',
 	].join('&');
 
-	const onChangeCategory = (index) => {
+	const onChangeCategory = useCallback((index) => {
 		dispatch(setCategoryId(index));
 		dispatch(setCurrentPage(1));
-	}
+		// eslint-disable-next-line
+	}, []);
 
-	const onClickSort = (obj) => {
+	const onClickSort = useCallback((obj) => {
 		dispatch(setSortType(obj));
 		dispatch(setCurrentPage(1));
-	}
-
-	const onChangePage = (number) => {
-		dispatch(setCurrentPage(number));
-	}
-
-	useEffect(() => {
-		console.log(urlParams);
-		axios
-			.get(`https://62d50136d4406e523550b12e.mockapi.io/items/?${urlParams}`)
-			.then(({ data }) => setPageCount(Math.ceil(data.length / itemsPerPage)));
 		// eslint-disable-next-line
-	}, [categoryId, searchValue])
+	}, []);
 
-	useEffect(() => {
+	const onChangePage = useCallback((number) => {
+		dispatch(setCurrentPage(number));
+		// eslint-disable-next-line
+	}, []);
+
+	const getPizzas = async () => {
 		const page = `&page=${currentPage}&limit=${itemsPerPage}`;
 
-		setIsLoading(true);
-		axios
-			.get(`https://62d50136d4406e523550b12e.mockapi.io/items/?${urlParams}${page}`)
-			.then(({ data }) => {
-				setIsLoading(false);
-				setItems(data);
+		await dispatch(fetchPizzas({
+			urlParams,
+			page
+		}));
+
+		window.scrollTo({
+			top: 0,
+			left: 0,
+			behavior: 'smooth'
+		})
+	};
+
+	useEffect(() => {
+		if (window.location.search) {
+			const params = qs.parse(window.location.search.substring(1));
+
+			const sortType = sortList.find(obj => {
+				const sortProperty = params.sortBy;
+				const order = params.order;
+
+				return obj.sortProperty === sortProperty && obj.order === order;
+			})
+
+
+			dispatch(setFilters({
+				...params,
+				currentPage: currentPage < pageCount ? pageCount : 1,
+				sortType
+			}));
+			isSearch.current = true;
+		}
+		// eslint-disable-next-line
+	}, [])
+
+	useEffect(() => {
+		if (isMounted.current) {
+			const queryString = qs.stringify({
+				sortBy: sortType.sortProperty,
+				order: sortType.order,
+				categoryId,
+				currentPage: currentPage < pageCount ? pageCount : 1
 			});
+
+			navigate(`?${queryString}`);
+		}
+		// eslint-disable-next-line
+	}, [categoryId, sortType, currentPage])
+
+	useEffect(() => {
+		if (!isSearch.current) {
+			getPizzas();
+		}
+
+		isSearch.current = false;
+		isMounted.current = true;
 		// eslint-disable-next-line
 	}, [categoryId, sortType, searchValue, currentPage])
 
-	const pizzas = !isLoading &&
+	const pizzas = (status === 'success') &&
 		(
 			pageCount > 0 ?
 				items.map((pizza) => (
 					<PizzaBlock
 						key={pizza.id}
 						{...pizza} />
-				)) :
-				<h3>В данный момент пиццы отстуствуют</h3>
+				)) : (
+					<div className='cart--empty'>
+						<h2>Ну удалось найти пиццы <span>😕</span></h2>
+					</div>
+				)
 		);
 
-	const skeleton = isLoading &&
-		Array.from(Array(4), () => 0).map((_, i) => (
+	const skeleton = (status === 'loading') &&
+		Array.from(Array(itemsPerPage), () => 0).map((_, i) => (
 			<Skeleton key={i} />
 		));
 
+	const error = (status === 'error') &&
+		(
+			<div className='cart--empty'>
+				<h2>Произошла ошибка <span>😕</span></h2>
+				<p>К сожалению, не удалось получить пиццы. Попробуйте повторить попытку позже.</p>
+			</div>
+		)
+
 	const itemsClass = [
 		'content__items',
-		items.length <= 0 && !isLoading ? 'content__items--empty' : ''
+		(items.length <= 0 && (status !== 'loading')) ? 'content__items--empty' : ''
 	].join(' ');
 
 	return (
-		<div className="container">
+		<div className="container container--home" >
 			<div className="content__top">
 				<Categories
 					value={categoryId}
@@ -92,9 +148,10 @@ const Home = () => {
 			</div>
 			<h2 className="content__title">Все пиццы</h2>
 
-			<div className={itemsClass}>
+			<div className={itemsClass} >
 				{skeleton}
 				{pizzas}
+				{error}
 			</div>
 
 			{pageCount > 1 &&

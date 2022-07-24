@@ -3,7 +3,7 @@ import {
 	Route,
 } from "react-router-dom";
 
-import { Header } from './components/Header';
+import Header from './components/Header';
 import NotFound from './pages/NotFound';
 import Home from './pages/Home';
 import Cart from './pages/Cart';
@@ -23,6 +23,6 @@ function App() {
 			</div>
 		</div>
 	);
-}
+};
 
 export default App;

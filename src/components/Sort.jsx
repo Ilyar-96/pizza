@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-const list = [
+export const sortList = [
 	{ name: 'популярности (по возрастанию)', sortProperty: 'rating', order: 'asc' },
 	{ name: 'популярности  (по убыванию)', sortProperty: 'rating', order: 'desc' },
 	{ name: 'цене (сначала дешевые)', sortProperty: 'price', order: 'asc' },
@@ -9,7 +9,7 @@ const list = [
 	{ name: 'алфавиту (Я-А)', sortProperty: 'title', order: 'desc' },
 ];
 
-export function Sort({ value, onChangeSort }) {
+const Sort = ({ value, onChangeSort }) => {
 	const [open, setOpen] = useState(false);
 	const popupRef = useRef(null);
 
@@ -47,7 +47,7 @@ export function Sort({ value, onChangeSort }) {
 			open && (
 				<div className="sort__popup">
 					<ul>
-						{list.map((obj, i) => (
+						{sortList.map((obj, i) => (
 							<li
 								onClick={() => onClickListItem(obj)}
 								key={obj.name}
@@ -59,4 +59,6 @@ export function Sort({ value, onChangeSort }) {
 			)
 		}
 	</div >);
-}
+};
+
+export default React.memo(Sort);
