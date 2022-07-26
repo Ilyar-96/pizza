@@ -8,8 +8,8 @@ import Sort, { sortList } from '../components/Sort';
 import PizzaBlock from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
-import { setCategoryId, setCurrentPage, setFilters, setSortType } from '../redux/slices/filterSlice';
-import { fetchPizzas } from '../redux/slices/pizzasSlice';
+import { selectFilters, setCategoryId, setCurrentPage, setFilters, setSortType } from '../redux/slices/filterSlice';
+import { fetchPizzas, selectPizzasData } from '../redux/slices/pizzasSlice';
 
 const Home = () => {
 	const dispatch = useDispatch();
@@ -17,8 +17,8 @@ const Home = () => {
 	const isSearch = useRef(false);
 	const isMounted = useRef(false);
 
-	const { categoryId, sortType, searchValue, currentPage } = useSelector(({ filters }) => filters);
-	const { items, pageCount, itemsPerPage, status } = useSelector((state) => state.pizzas);
+	const { categoryId, sortType, searchValue, currentPage } = useSelector(selectFilters);
+	const { items, pageCount, itemsPerPage, status } = useSelector(selectPizzasData);
 
 	const urlParams = [
 		categoryId !== 0 ? `category=${categoryId}` : '',

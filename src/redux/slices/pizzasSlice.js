@@ -15,13 +15,7 @@ export const fetchPizzas = createAsyncThunk(
 		const allItems = await axios.get(`${_apiBase}/items/?${urlParams}`);
 		const res = await axios.get(`${_apiBase}/items/?${urlParams}${page}`);
 
-		window.scrollTo({
-			top: 0,
-			left: 0,
-			behavior: 'smooth'
-		})
-
-		return [allItems.data, res.data];
+		return { allItems: allItems.data, pageItems: res.data };
 	}
 )
 
@@ -32,10 +26,11 @@ export const pizzasSlice = createSlice({
 	extraReducers: {
 		[fetchPizzas.pending]: (state) => {
 			state.status = 'loading';
+			state.items = [];
 		},
 		[fetchPizzas.fulfilled]: (state, action) => {
-			state.pageCount = Math.ceil(action.payload[0].length / state.itemsPerPage);
-			state.items = state.items = action.payload[1];
+			state.pageCount = Math.ceil(action.payload.allItems.length / state.itemsPerPage);
+			state.items = action.payload.pageItems;
 			state.status = 'success';
 		},
 		[fetchPizzas.rejected]: (state) => {
@@ -44,6 +39,9 @@ export const pizzasSlice = createSlice({
 		},
 	}
 });
+
+export const selectPizzasData = (state) => state.pizzas;
+export const selectPizzas = (state) => state.pizzas.items;
 
 export const { setItems } = pizzasSlice.actions;
 

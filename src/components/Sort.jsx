@@ -13,7 +13,6 @@ const Sort = ({ value, onChangeSort }) => {
 	const [open, setOpen] = useState(false);
 	const popupRef = useRef(null);
 
-
 	const handleOutsideClick = e => {
 		const path = e.path || (e.composedPath && e.composedPath());
 		if (!path.includes(popupRef.current)) {

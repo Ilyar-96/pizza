@@ -1,19 +1,16 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addItem } from "../../redux/slices/cartSlice";
+import { addItem, selectCartItems } from '../../redux/slices/cartSlice';
+import { Link } from 'react-router-dom';
 
 const typeNames = ['тонкое', 'традиционное'];
-
-const replaceSpacesToLodash = (str) => {
-	return str.replace(/ /g, '_');
-}
 
 const PizzaBlock = ({ id, title, price, imageUrl, sizes, types }) => {
 	const dispatch = useDispatch();
 	const [activeType, setActiveType] = useState(Math.min(...types));
 	const [activeSize, setActiveSize] = useState(Math.min(...sizes));
-	const items = useSelector(({ cart }) => cart.items);
-	const slug = replaceSpacesToLodash(`${title} ${typeNames[activeType]} ${activeSize}`);
+	const items = useSelector(selectCartItems);
+	const slug = `${title}_${typeNames[activeType]}_${activeSize}`;
 	const targetItems = items.filter(item => item.id === id);
 	const addedCount = targetItems.reduce((sum, obj) => sum + obj.totalCount, 0);
 
@@ -33,10 +30,13 @@ const PizzaBlock = ({ id, title, price, imageUrl, sizes, types }) => {
 
 	return (
 		<div className="pizza-block">
-			<div className="pizza-block__image-wrapper" >
-				<img className="pizza-block__image" src={imageUrl} alt="Pizza" />
-			</div>
-			<h4 className="pizza-block__title">{title}</h4>
+			<Link to={`/pizza/${id}`}>
+				<div className="pizza-block__image-wrapper" >
+					<img className="pizza-block__image" src={imageUrl} alt="Pizza" />
+				</div>
+
+				<h4 className="pizza-block__title">{title}</h4>
+			</Link>
 			<div className="pizza-block__selector">
 				<ul>
 					{
