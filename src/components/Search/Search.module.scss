@@ -2,9 +2,18 @@
 	position: relative;
 
 	width: 100%;
-	max-width: 400px;
-	margin: 0 40px;
-	flex: 0 1 400px;
+
+	@media (min-width: 767.98px) {
+		max-width: 400px;
+		margin: 0 40px;
+		flex: 0 1 400px;
+	}
+
+	@media (max-width: 767.98px) {
+		order: 1;
+		flex: 1 1 100%;
+		margin-top: 30px;
+	}
 }
 
 .input {

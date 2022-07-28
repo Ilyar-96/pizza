@@ -1,21 +1,22 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-
+import { useEffect, useState, FC } from 'react';
 import axios from 'axios'
+import { TPizzaItem } from '../components/PizzaBlock';
 
-const FullPizza = () => {
+const FullPizza: FC = () => {
 	const { id } = useParams();
-	const [item, setItem] = useState()
+	const [item, setItem] = useState<TPizzaItem>()
 	const navigate = useNavigate();
 
 
 	useEffect(() => {
 		axios.get(`https://62d50136d4406e523550b12e.mockapi.io/items/${id}`)
 			.then(({ data }) => setItem(data))
-			.catch((err) => {
+			.catch(() => {
 				alert('Ошибка при получении пиццы');
 				navigate('/');
 			});
+		// eslint-disable-next-line
 	}, [id])
 
 	if (!item) {

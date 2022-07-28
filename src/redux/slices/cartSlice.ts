@@ -1,19 +1,43 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../store";
 
-const initialState = {
+type TCartItem = {
+	id: string;
+	slug: string;
+	imageUrl: string;
+	title: string;
+	price: number;
+	type: string;
+	size: number;
+	totalCount: number;
+	totalPrice: number;
+}
+
+interface ICartSliceState {
+	totalCount: number;
+	totalPrice: number;
+	items: TCartItem[];
+}
+
+const initialState: ICartSliceState = {
 	totalCount: 0,
 	totalPrice: 0,
 	items: []
 }
 
-const getTargetItem = (items, slug) => {
+const getTargetItem = (items: TCartItem[], slug: string): [number, TCartItem] => {
 	const targetItemIndex = items.findIndex(item => item.slug === slug);
 	const targetItem = items[targetItemIndex];
 
 	return [targetItemIndex, targetItem];
 };
 
-const changeStatePriceAndCount = (state, count, price, isInc = true) => {
+const changeStatePriceAndCount = (
+	state: ICartSliceState,
+	count: number,
+	price: number,
+	isInc = true
+) => {
 	if (isInc) {
 		state.totalCount += count;
 		state.totalPrice += price;
@@ -27,7 +51,8 @@ export const cartSlice = createSlice({
 	name: 'cart',
 	initialState,
 	reducers: {
-		addItem(state, { payload }) {
+		addItem(state, action: PayloadAction<TCartItem>) {
+			const { payload } = action;
 			const [targetItemIndex] = getTargetItem(state.items, payload.slug);
 
 			if (targetItemIndex >= 0) {
@@ -43,8 +68,8 @@ export const cartSlice = createSlice({
 
 			changeStatePriceAndCount(state, 1, payload.price);
 		},
-		minusItem(state, { payload }) {
-			const [targetItemIndex, targetItem] = getTargetItem(state.items, payload);
+		minusItem(state, action: PayloadAction<string>) {
+			const [targetItemIndex, targetItem] = getTargetItem(state.items, action.payload);
 
 			if (targetItem.totalCount > 1) {
 				targetItem.totalCount -= 1;
@@ -55,8 +80,8 @@ export const cartSlice = createSlice({
 
 			changeStatePriceAndCount(state, 1, targetItem.price, false);
 		},
-		removeItem(state, { payload }) {
-			const [targetItemIndex, targetItem] = getTargetItem(state.items, payload);
+		removeItem(state, action: PayloadAction<string>) {
+			const [targetItemIndex, targetItem] = getTargetItem(state.items, action.payload);
 
 			state.items.splice(targetItemIndex, 1);
 			changeStatePriceAndCount(state, targetItem.totalCount, targetItem.totalPrice, false);
@@ -69,8 +94,8 @@ export const cartSlice = createSlice({
 	}
 });
 
-export const selectCart = (state) => state.cart;
-export const selectCartItems = (state) => state.cart.items;
+export const selectCart = (state: RootState) => state.cart;
+export const selectCartItems = (state: RootState) => state.cart.items;
 
 export const {
 	addItem,

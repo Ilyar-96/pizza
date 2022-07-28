@@ -1,15 +1,27 @@
-import { useState } from "react";
+import { FC, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addItem, selectCartItems } from '../../redux/slices/cartSlice';
 import { Link } from 'react-router-dom';
+import { ICartItem } from "../Cart/CartItem";
 
 const typeNames = ['тонкое', 'традиционное'];
 
-const PizzaBlock = ({ id, title, price, imageUrl, sizes, types }) => {
+export type TPizzaItem = {
+	id: string;
+	imageUrl: string;
+	title: string;
+	price: number;
+	types: number[];
+	sizes: number[];
+	category: number;
+	rating: number;
+}
+
+const PizzaBlock: FC<TPizzaItem> = ({ id, title, price, imageUrl, sizes, types }) => {
 	const dispatch = useDispatch();
 	const [activeType, setActiveType] = useState(Math.min(...types));
 	const [activeSize, setActiveSize] = useState(Math.min(...sizes));
-	const items = useSelector(selectCartItems);
+	const items: ICartItem[] = useSelector(selectCartItems);
 	const slug = `${title}_${typeNames[activeType]}_${activeSize}`;
 	const targetItems = items.filter(item => item.id === id);
 	const addedCount = targetItems.reduce((sum, obj) => sum + obj.totalCount, 0);
@@ -22,7 +34,9 @@ const PizzaBlock = ({ id, title, price, imageUrl, sizes, types }) => {
 			price,
 			imageUrl,
 			type: typeNames[activeType],
-			size: activeSize
+			size: activeSize,
+			totalCount: 0,
+			totalPrice: 0
 		};
 
 		dispatch(addItem(item));

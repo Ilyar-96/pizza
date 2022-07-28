@@ -8,10 +8,18 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+
+		@media (max-width: 767.98px) {
+			flex-wrap: wrap;
+		}
 	}
 
 	&__logo {
 		display: flex;
+
+		@media (max-width: 767.98px) {
+			flex: 1;
+		}
 
 		img {
 			margin-right: 15px;

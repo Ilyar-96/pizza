@@ -1,55 +1,51 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { FC, useCallback, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import qs from 'qs'
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
+import { useAppDispatch } from '../redux/store';
 import Categories from '../components/Categories';
-import Sort, { sortList } from '../components/Sort';
+import Sort, { TSortType, sortList } from '../components/Sort';
 import PizzaBlock from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
 import { selectFilters, setCategoryId, setCurrentPage, setFilters, setSortType } from '../redux/slices/filterSlice';
-import { fetchPizzas, selectPizzasData } from '../redux/slices/pizzasSlice';
+import { fetchPizzas, selectPizzasData, Status } from '../redux/slices/pizzasSlice';
 
-const Home = () => {
-	const dispatch = useDispatch();
+const Home: FC = () => {
+	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const isSearch = useRef(false);
 	const isMounted = useRef(false);
+	const location = useLocation();
 
 	const { categoryId, sortType, searchValue, currentPage } = useSelector(selectFilters);
 	const { items, pageCount, itemsPerPage, status } = useSelector(selectPizzasData);
 
-	const urlParams = [
-		categoryId !== 0 ? `category=${categoryId}` : '',
-		sortType.sortProperty !== 0 ? `sortBy=${sortType.sortProperty}&order=${sortType.order}` : '',
-		searchValue ? `title=${searchValue}` : '',
-	].join('&');
-
-	const onChangeCategory = useCallback((index) => {
-		dispatch(setCategoryId(index));
+	const onChangeCategory = useCallback((category: number) => {
+		dispatch(setCategoryId(category));
 		dispatch(setCurrentPage(1));
 		// eslint-disable-next-line
 	}, []);
 
-	const onClickSort = useCallback((obj) => {
+	const onClickSort = useCallback((obj: TSortType) => {
 		dispatch(setSortType(obj));
 		dispatch(setCurrentPage(1));
 		// eslint-disable-next-line
 	}, []);
 
-	const onChangePage = useCallback((number) => {
-		dispatch(setCurrentPage(number));
+	const onChangePage = useCallback((page: number) => {
+		dispatch(setCurrentPage(page));
 		// eslint-disable-next-line
 	}, []);
 
 	const getPizzas = async () => {
-		const page = `&page=${currentPage}&limit=${itemsPerPage}`;
-
-		await dispatch(fetchPizzas({
-			urlParams,
-			page
-		}));
+		await dispatch(
+			fetchPizzas({
+				categoryId,
+				currentPage,
+				sortType
+			}));
 
 		window.scrollTo({
 			top: 0,
@@ -59,21 +55,23 @@ const Home = () => {
 	};
 
 	useEffect(() => {
-		if (window.location.search) {
-			const params = qs.parse(window.location.search.substring(1));
+		if (location.search) {
+			const params = qs.parse(location.search.substring(1));
+			const searchCategoryId = Number(params.category);
+			const searchCurrentPage = Number(params.page);
 
-			const sortType = sortList.find(obj => {
+			const searchSortType = sortList.find(obj => {
 				const sortProperty = params.sortBy;
 				const order = params.order;
 
 				return obj.sortProperty === sortProperty && obj.order === order;
 			})
 
-
 			dispatch(setFilters({
-				...params,
-				currentPage: currentPage < pageCount ? pageCount : 1,
-				sortType
+				categoryId: searchCategoryId,
+				searchValue,
+				currentPage: searchCategoryId < 1 ? searchCurrentPage : 1,
+				sortType: searchSortType?.order ? searchSortType : sortType
 			}));
 			isSearch.current = true;
 		}
@@ -85,8 +83,8 @@ const Home = () => {
 			const queryString = qs.stringify({
 				sortBy: sortType.sortProperty,
 				order: sortType.order,
-				categoryId,
-				currentPage: currentPage < pageCount ? pageCount : 1
+				category: categoryId,
+				page: currentPage,
 			});
 
 			navigate(`?${queryString}`);
@@ -104,10 +102,10 @@ const Home = () => {
 		// eslint-disable-next-line
 	}, [categoryId, sortType, searchValue, currentPage])
 
-	const pizzas = (status === 'success') &&
+	const pizzas = (status === Status.SUCCESS) &&
 		(
 			pageCount > 0 ?
-				items.map((pizza) => (
+				items.map((pizza: any) => (
 					<PizzaBlock
 						key={pizza.id}
 						{...pizza} />
@@ -118,12 +116,12 @@ const Home = () => {
 				)
 		);
 
-	const skeleton = (status === 'loading') &&
+	const skeleton = (status === Status.LOADING) &&
 		Array.from(Array(itemsPerPage), () => 0).map((_, i) => (
 			<Skeleton key={i} />
 		));
 
-	const error = (status === 'error') &&
+	const error = (status === Status.ERROR) &&
 		(
 			<div className='cart--empty'>
 				<h2>Произошла ошибка <span>😕</span></h2>
@@ -133,7 +131,7 @@ const Home = () => {
 
 	const itemsClass = [
 		'content__items',
-		(items.length <= 0 && (status !== 'loading')) ? 'content__items--empty' : ''
+		(items.length <= 0 && (status !== Status.LOADING)) ? 'content__items--empty' : ''
 	].join(' ');
 
 	return (
@@ -155,11 +153,15 @@ const Home = () => {
 			</div>
 
 			{pageCount > 1 &&
-				(<Pagination
-					pageCount={pageCount}
-					itemsPerPage={itemsPerPage}
-					currentPage={currentPage}
-					onChangePage={onChangePage} />)}
+				(
+					<Pagination
+						pageCount={pageCount}
+						itemsPerPage={itemsPerPage}
+						currentPage={currentPage}
+						onChangePage={onChangePage}
+						status={status}
+					/>
+				)}
 		</div>
 	)
 }

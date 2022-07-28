@@ -13,6 +13,7 @@
 		li {
 			border: 1px solid #fe5f1e;
 			border-radius: 50%;
+			user-select: none;
 
 			a {
 				display: inline-flex;
@@ -53,4 +54,8 @@
 			}
 		}
 	}
+}
+
+.disabled {
+	pointer-events: none;
 }

@@ -1,14 +1,15 @@
+import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { clearItems, selectCart } from '../redux/slices/cartSlice';
 import CartItem from '../components/Cart/CartItem';
 import CartEmty from '../components/Cart/CartEmty';
 
-const Cart = () => {
+const Cart: FC = () => {
 	const dispatch = useDispatch();
 	const { items, totalPrice, totalCount } = useSelector(selectCart);
 
-	const onClickClear = () => {
+	const onClickClear = (): void => {
 		if (window.confirm('Действительно хотите очистить корзину?')) {
 			dispatch(clearItems())
 		}
@@ -45,7 +46,7 @@ const Cart = () => {
 
 				<div className="content__items">
 					{
-						items.map(item => {
+						items.map((item: any) => {
 							return (
 								<CartItem key={item.slug} {...item} />
 							)

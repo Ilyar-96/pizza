@@ -1,7 +1,8 @@
+import { FC } from "react";
 import { Link } from "react-router-dom";
 import NotFoundBlock from '../components/NotFoundBlock';
 
-const NotFound = () => {
+const NotFound: FC = () => {
 	return (
 		<div className="not-found" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 30, padding: '100px 0' }}>
 			<NotFoundBlock />
