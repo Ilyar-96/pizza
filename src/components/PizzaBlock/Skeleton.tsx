@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { FC } from "react";
 import ContentLoader from "react-content-loader";
 

@@ -15,7 +15,6 @@ type TCategoriesProps = {
 }
 
 const Categories: FC<TCategoriesProps> = ({ value, onChangeCategory }) => {
-
 	return (
 		<div className="categories">
 			<ul>

@@ -1,7 +1,8 @@
+import clsx from 'clsx';
 import { FC } from 'react';
 import ReactPaginate from 'react-paginate';
 
-import { Status } from '../../redux/slices/pizzasSlice';
+import { Status } from "../../redux/slices/pizza/types";
 
 import styles from './Pagination.module.scss';
 
@@ -13,10 +14,16 @@ type TPaginationProps = {
 	status: Status;
 }
 
-const Pagination: FC<TPaginationProps> = ({ itemsPerPage, pageCount, currentPage, onChangePage, status }) => {
+const Pagination: FC<TPaginationProps> = ({
+	itemsPerPage,
+	pageCount,
+	currentPage,
+	onChangePage,
+	status
+}) => {
 	return (
 		<ReactPaginate
-			className={`${styles.root} ${status === Status.LOADING ? styles.disabled : ''}`}
+			className={clsx(styles.root, [status === Status.LOADING && styles.disabled])}
 			breakLabel="..."
 			nextLabel=">"
 			onPageChange={(event) => onChangePage(event.selected + 1)}

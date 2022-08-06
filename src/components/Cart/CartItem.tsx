@@ -1,6 +1,6 @@
-import { FC } from "react";
+import { FC, memo } from "react";
 import { useDispatch } from "react-redux";
-import { addItem, minusItem, removeItem } from "../../redux/slices/cartSlice";
+import { addItem, minusItem, removeItem } from "../../redux/slices/cart/slice";
 
 export type ICartItem = {
 	id: string;
@@ -20,7 +20,6 @@ const CartItem: FC<ICartItem> = (props) => {
 	const item: ICartItem = { ...props };
 
 	const onClickPlus = (): void => {
-		console.log(item);
 		dispatch(addItem(item))
 	}
 
@@ -75,4 +74,4 @@ const CartItem: FC<ICartItem> = (props) => {
 	</div>);
 }
 
-export default CartItem;
+export default memo(CartItem);

@@ -1,25 +1,32 @@
-import { FC } from "react";
+import { FC, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { selectCart } from '../redux/slices/cartSlice';
 import Search from './Search';
-
-import logoSvg from '../assets/img/pizza-logo.svg';
+import { selectCart } from "../redux/slices/cart/selectors";
+import { Logo } from "./Logo";
 
 const Header: FC = () => {
-	const { totalPrice, totalCount } = useSelector(selectCart);
+	const { items, totalPrice, totalCount } = useSelector(selectCart);
+	const isMounted = useRef(false);
+
+	useEffect(() => {
+		if (isMounted.current) {
+			const json = JSON.stringify({
+				items,
+				totalPrice,
+				totalCount
+			});
+			localStorage.setItem('cart', json);
+		}
+		isMounted.current = true;
+		// eslint-disable-next-line 
+	}, [totalCount])
 
 	return (
 		<div className="header">
 			<div className="container">
-				<Link to="/" className="header__logo">
-					<img width={38} src={logoSvg} alt="Pizza logo" />
-					<div>
-						<h1>React Pizza</h1>
-						<p>самая вкусная пицца во вселенной</p>
-					</div>
-				</Link>
+				<Logo />
 
 				<Search />
 

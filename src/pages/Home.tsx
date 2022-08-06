@@ -9,17 +9,19 @@ import Sort, { TSortType, sortList } from '../components/Sort';
 import PizzaBlock from '../components/PizzaBlock';
 import Skeleton from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
-import { selectFilters, setCategoryId, setCurrentPage, setFilters, setSortType } from '../redux/slices/filterSlice';
-import { fetchPizzas, selectPizzasData, Status } from '../redux/slices/pizzasSlice';
+import { setCategoryId, setCurrentPage, setFilters, setSortType } from '../redux/slices/filter/slice';
+import { selectFilters } from "../redux/slices/filter/selectors";
+import { fetchPizzas } from "../redux/slices/pizza/asyncActions";
+import { selectPizzasData } from "../redux/slices/pizza/selectors";
+import { Status } from "../redux/slices/pizza/types";
 
 const Home: FC = () => {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-	const isSearch = useRef(false);
 	const isMounted = useRef(false);
 	const location = useLocation();
 
-	const { categoryId, sortType, searchValue, currentPage } = useSelector(selectFilters);
+	const { categoryId, sortType, searchValue, currentPage, isFiltersChanged } = useSelector(selectFilters);
 	const { items, pageCount, itemsPerPage, status } = useSelector(selectPizzasData);
 
 	const onChangeCategory = useCallback((category: number) => {
@@ -44,7 +46,8 @@ const Home: FC = () => {
 			fetchPizzas({
 				categoryId,
 				currentPage,
-				sortType
+				sortType,
+				searchValue
 			}));
 
 		window.scrollTo({
@@ -68,12 +71,11 @@ const Home: FC = () => {
 			})
 
 			dispatch(setFilters({
-				categoryId: searchCategoryId,
+				categoryId: !searchValue ? searchCategoryId : 0,
 				searchValue,
 				currentPage: searchCategoryId < 1 ? searchCurrentPage : 1,
 				sortType: searchSortType?.order ? searchSortType : sortType
 			}));
-			isSearch.current = true;
 		}
 		// eslint-disable-next-line
 	}, [])
@@ -83,7 +85,7 @@ const Home: FC = () => {
 			const queryString = qs.stringify({
 				sortBy: sortType.sortProperty,
 				order: sortType.order,
-				category: categoryId,
+				category: !searchValue ? categoryId : 0,
 				page: currentPage,
 			});
 
@@ -93,14 +95,25 @@ const Home: FC = () => {
 	}, [categoryId, sortType, currentPage])
 
 	useEffect(() => {
-		if (!isSearch.current) {
+		if (isMounted.current) {
+
+			if (searchValue) {
+				dispatch(setCategoryId(0));
+			}
+
 			getPizzas();
 		}
 
-		isSearch.current = false;
 		isMounted.current = true;
 		// eslint-disable-next-line
-	}, [categoryId, sortType, searchValue, currentPage])
+	}, [categoryId, sortType, searchValue, currentPage, isFiltersChanged])
+
+	useEffect(() => {
+		if (!location.search) {
+			getPizzas();
+		}
+		// eslint-disable-next-line
+	}, [])
 
 	const pizzas = (status === Status.SUCCESS) &&
 		(
