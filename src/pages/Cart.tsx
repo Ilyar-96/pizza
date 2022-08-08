@@ -2,8 +2,7 @@ import { FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { clearItems } from '../redux/slices/cart/slice';
-import CartItem from '../components/Cart/CartItem';
-import CartEmty from '../components/Cart/CartEmty';
+import { CartEmty, CartItem } from '../components';
 import { selectCart } from "../redux/slices/cart/selectors";
 
 const Cart: FC = () => {

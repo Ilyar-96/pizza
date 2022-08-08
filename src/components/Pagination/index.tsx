@@ -14,7 +14,7 @@ type TPaginationProps = {
 	status: Status;
 }
 
-const Pagination: FC<TPaginationProps> = ({
+export const Pagination: FC<TPaginationProps> = ({
 	itemsPerPage,
 	pageCount,
 	currentPage,
@@ -34,5 +34,3 @@ const Pagination: FC<TPaginationProps> = ({
 		/>
 	)
 }
-
-export default Pagination;

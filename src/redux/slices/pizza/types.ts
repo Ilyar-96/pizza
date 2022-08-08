@@ -1,5 +1,5 @@
 import { TPizzaItem } from "../../../components/PizzaBlock";
-import { TSortType } from "../../../components/Sort";
+import { TSortType } from "../../../components/Sort/types";
 
 
 export enum Status {

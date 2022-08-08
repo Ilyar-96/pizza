@@ -4,11 +4,8 @@ import qs from 'qs'
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAppDispatch } from '../redux/store';
-import Categories from '../components/Categories';
-import Sort, { TSortType, sortList } from '../components/Sort';
-import PizzaBlock from '../components/PizzaBlock';
-import Skeleton from '../components/PizzaBlock/Skeleton';
-import Pagination from '../components/Pagination';
+import { TSortType, sortList } from "../components/Sort/types";
+import { Pagination, Categories, Sort, PizzaBlock, Skeleton } from '../components';
 import { setCategoryId, setCurrentPage, setFilters, setSortType } from '../redux/slices/filter/slice';
 import { selectFilters } from "../redux/slices/filter/selectors";
 import { fetchPizzas } from "../redux/slices/pizza/asyncActions";

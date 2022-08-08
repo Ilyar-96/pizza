@@ -2,11 +2,10 @@ import { FC, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-import Search from './Search';
 import { selectCart } from "../redux/slices/cart/selectors";
-import { Logo } from "./Logo";
+import { Logo, Search } from './';
 
-const Header: FC = () => {
+export const Header: FC = () => {
 	const { items, totalPrice, totalCount } = useSelector(selectCart);
 	const isMounted = useRef(false);
 
@@ -46,5 +45,3 @@ const Header: FC = () => {
 		</div>
 	);
 };
-
-export default Header;

@@ -1,22 +1,13 @@
 import { FC, memo } from "react";
-import { useDispatch } from "react-redux";
+import { Link } from 'react-router-dom';
+import { useAppDispatch } from '../../redux/store';
+
 import { addItem, minusItem, removeItem } from "../../redux/slices/cart/slice";
+import { ICartItem } from "./types";
 
-export type ICartItem = {
-	id: string;
-	slug: string;
-	imageUrl: string;
-	title: string;
-	price: number;
-	type: string;
-	size: number;
-	totalCount: number;
-	totalPrice: number;
-}
-
-const CartItem: FC<ICartItem> = (props) => {
-	const { slug, title, imageUrl, size, type, totalCount, totalPrice } = props;
-	const dispatch = useDispatch();
+export const CartItem: FC<ICartItem> = memo((props) => {
+	const { id, slug, title, imageUrl, size, type, totalCount, totalPrice } = props;
+	const dispatch = useAppDispatch();
 	const item: ICartItem = { ...props };
 
 	const onClickPlus = (): void => {
@@ -39,10 +30,14 @@ const CartItem: FC<ICartItem> = (props) => {
 
 	return (<div className="cart__item">
 		<div className="cart__item-img">
-			<img className="pizza-block__image" src={imageUrl} alt={title} />
+			<Link to={`/pizza/${id}`}>
+				<img className="pizza-block__image" src={imageUrl} alt={title} />
+			</Link>
 		</div>
 		<div className="cart__item-info">
-			<h3>{title}</h3>
+			<Link to={`/pizza/${id}`}>
+				<h3>{title}</h3>
+			</Link>
 			<p>{type}, {size} см.</p>
 		</div>
 		<div className="cart__item-count">
@@ -72,6 +67,4 @@ const CartItem: FC<ICartItem> = (props) => {
 			</div>
 		</div>
 	</div>);
-}
-
-export default memo(CartItem);
+})

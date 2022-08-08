@@ -2,7 +2,7 @@ import { FC, memo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addItem } from '../../redux/slices/cart/slice';
 import { Link } from 'react-router-dom';
-import { ICartItem } from "../Cart/CartItem";
+import { ICartItem } from "../Cart/types";
 import { selectCartItems } from "../../redux/slices/cart/selectors";
 
 const typeNames = ['тонкое', 'традиционное'];
@@ -18,7 +18,7 @@ export type TPizzaItem = {
 	rating: number;
 }
 
-const PizzaBlock: FC<TPizzaItem> = ({ id, title, price, imageUrl, sizes, types }) => {
+export const PizzaBlock: FC<TPizzaItem> = memo(({ id, title, price, imageUrl, sizes, types }) => {
 	const dispatch = useDispatch();
 	const [activeType, setActiveType] = useState(Math.min(...types));
 	const [activeSize, setActiveSize] = useState(Math.min(...sizes));
@@ -91,6 +91,4 @@ const PizzaBlock: FC<TPizzaItem> = ({ id, title, price, imageUrl, sizes, types }
 			</div>
 		</div>
 	);
-};
-
-export default memo(PizzaBlock);
+});

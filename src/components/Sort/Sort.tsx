@@ -1,37 +1,7 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState, memo } from "react";
+import { SortProps, TSortType, sortList } from "./types";
 
-enum SortProperties {
-	RATING = 'rating',
-	PRICE = 'price',
-	TITLE = 'title'
-}
-
-enum Orders {
-	ASC = 'asc',
-	DESC = 'desc',
-}
-
-export type TSortType = {
-	name: string;
-	sortProperty: SortProperties;
-	order: Orders;
-}
-
-export const sortList: TSortType[] = [
-	{ name: 'популярности (по возрастанию)', sortProperty: SortProperties.RATING, order: Orders.ASC },
-	{ name: 'популярности  (по убыванию)', sortProperty: SortProperties.RATING, order: Orders.DESC },
-	{ name: 'цене (сначала дешевые)', sortProperty: SortProperties.PRICE, order: Orders.ASC },
-	{ name: 'цене  (сначала дорогие)', sortProperty: SortProperties.PRICE, order: Orders.DESC },
-	{ name: 'алфавиту (А-Я)', sortProperty: SortProperties.TITLE, order: Orders.ASC },
-	{ name: 'алфавиту (Я-А)', sortProperty: SortProperties.TITLE, order: Orders.DESC },
-];
-
-interface SortProps {
-	value: TSortType;
-	onChangeSort: (obj: TSortType) => void;
-}
-
-const Sort: FC<SortProps> = ({ value, onChangeSort }) => {
+export const Sort: FC<SortProps> = memo(({ value, onChangeSort }) => {
 	const [open, setOpen] = useState(false);
 	const popupRef = useRef<HTMLDivElement>(null);
 
@@ -83,6 +53,4 @@ const Sort: FC<SortProps> = ({ value, onChangeSort }) => {
 				)
 			}
 		</div >);
-};
-
-export default React.memo(Sort);
+});

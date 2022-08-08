@@ -1,7 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, FC } from 'react';
 import axios from 'axios'
+
 import { TPizzaItem } from '../components/PizzaBlock';
+import { Spinner } from '../components';
 
 const FullPizza: FC = () => {
 	const { id } = useParams();
@@ -21,9 +23,7 @@ const FullPizza: FC = () => {
 
 	if (!item) {
 		return (
-			<div className='container'>
-				<h2>Загрузка...</h2>
-			</div>
+			<Spinner />
 		)
 	}
 

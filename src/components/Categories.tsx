@@ -14,7 +14,7 @@ type TCategoriesProps = {
 	onChangeCategory: (i: number) => void;
 }
 
-const Categories: FC<TCategoriesProps> = ({ value, onChangeCategory }) => {
+export const Categories: FC<TCategoriesProps> = memo(({ value, onChangeCategory }) => {
 	return (
 		<div className="categories">
 			<ul>
@@ -29,6 +29,4 @@ const Categories: FC<TCategoriesProps> = ({ value, onChangeCategory }) => {
 			</ul>
 		</div >
 	);
-};
-
-export default memo(Categories);
+});

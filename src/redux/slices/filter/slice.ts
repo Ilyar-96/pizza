@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { TSortType, sortList } from '../../../components/Sort';
+import { TSortType, sortList } from "../../../components/Sort/types";
 import { IFilterSliceState } from './types';
 
 const initialState: IFilterSliceState = {

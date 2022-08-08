@@ -1,4 +1,4 @@
-import { TSortType } from '../../../components/Sort';
+import { TSortType } from "../../../components/Sort/types";
 
 export interface IFilterSliceState {
 	categoryId: number;

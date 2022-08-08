@@ -1,5 +1,6 @@
 import { FC } from "react";
 import { Link, useLocation } from "react-router-dom";
+
 import logoSvg from '../assets/img/pizza-logo.svg';
 
 export const Logo: FC = () => {

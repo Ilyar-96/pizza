@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { Link } from "react-router-dom";
-import NotFoundBlock from '../components/NotFoundBlock';
+
+import { NotFoundBlock } from '../components';
 
 const NotFound: FC = () => {
 	return (

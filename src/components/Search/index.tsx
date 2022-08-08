@@ -7,7 +7,7 @@ import { selectSearchValue } from "../../redux/slices/filter/selectors";
 
 import styles from './Search.module.scss';
 
-const Search: FC = () => {
+export const Search: FC = () => {
 	const dispatch = useDispatch();
 	const searchValue = useSelector(selectSearchValue);
 	const [value, setValue] = useState('');
@@ -53,5 +53,3 @@ const Search: FC = () => {
 		</div>
 	)
 }
-
-export default Search;
