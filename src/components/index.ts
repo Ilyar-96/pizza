@@ -1,5 +1,5 @@
 export * from './Logo';
-export * from './Sort/Sort';
+export * from './Sort';
 export * from './Header';
 export * from './Categories';
 export * from './Spinner/Spinner';
@@ -10,3 +10,4 @@ export * from './Cart/CartEmty';
 export * from './Cart/CartItem';
 export * from './Search';
 export * from './PizzaBlock/Skeleton';
+export * from './ConfirmModal/index';

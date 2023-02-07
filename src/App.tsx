@@ -5,7 +5,7 @@ import {
 } from "react-router-dom";
 
 import MainLayout from './layouts/MainLayout';
-import { Spinner } from "./components";
+import { ConfirmModal, Spinner } from "./components";
 import Home from './pages/Home';
 
 import './scss/app.scss';
@@ -23,6 +23,7 @@ const FullPizza = React.lazy(() => import(
 	'./pages/FullPizza'
 ));
 
+
 function App() {
 	return (
 		<div className="wrapper">
@@ -36,6 +37,8 @@ function App() {
 					</Route>
 				</Routes>
 			</Suspense>
+
+			<ConfirmModal />
 		</div>
 	);
 };

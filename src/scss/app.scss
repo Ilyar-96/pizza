@@ -7,6 +7,10 @@
 body {
 	background-color: $background;
 	scroll-behavior: smooth;
+
+	&.lock {
+		overflow: hidden;
+	}
 }
 
 .wrapper {
